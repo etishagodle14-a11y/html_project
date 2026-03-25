@@ -1,0 +1,124 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Result - Preview & Highlight</title>
+    <link rel="stylesheet" href="{% static 'generator/style.css' %}">
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <style>
+        .preview-container {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            margin: 20px 0;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .result-box { 
+            position: relative; 
+            margin-top: 10px;
+            text-align: left;
+        }
+        
+        /* Highlighted code ki height control karne ke liye */
+        pre[class*="language-"] {
+            border-radius: 8px;
+            max-height: 400px;
+            overflow: auto;
+            margin: 0;
+        }
+
+        /* Copy Button Styling */
+        .copy-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .copy-btn:hover { background-color: #0056b3; }
+        
+        #copy-status {
+            color: green;
+            font-size: 12px;
+            margin-left: 10px;
+            display: none;
+        }
+
+        /* Textarea ko chhupa diya hai kyunki hum highlighted code dikha rahe hain */
+        #codeBox {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>✅ Code Generate Ho Gaya!</h2>
+        
+        <div class="preview-container">
+            {{ final_code|safe }}
+        </div>
+
+        <hr>
+
+        <div style="text-align: left; display: flex; align-items: center; justify-content: space-between;">
+            <label><strong>HTML Code:</strong></label>
+            <div>
+                <span id="copy-status">Copied!</span>
+                <button class="copy-btn" onclick="copyToClipboard()">📋 Copy Code</button>
+            </div>
+        </div>
+
+        <div class="result-box">
+            <pre><code class="language-html">{{ final_code }}</code></pre>
+            
+            <textarea id="codeBox">{{ final_code }}</textarea>
+        </div>
+
+        <form method="POST" action="{% url 'home' %}">
+            {% csrf_token %}
+            <input type="hidden" name="user_content" value="{{ final_code }}">
+            <button type="submit" name="download" style="background-color: #28a745; margin-top: 20px; cursor: pointer; color: white; border: none; padding: 10px 20px; border-radius: 5px; width: 100%;">
+                📥 Download HTML File
+            </button>
+        </form>
+
+        <br>
+        <a href="{% url 'home' %}">← Naya Text Likhein</a>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+
+    <script>
+        function copyToClipboard() {
+            var copyText = document.getElementById("codeBox");
+            
+            // Textarea ko temporarily dikhana padega select karne ke liye
+            copyText.style.display = "block";
+            copyText.select();
+            copyText.setSelectionRange(0, 99999); 
+
+            document.execCommand("copy");
+            
+            // Wapas chhupa do
+            copyText.style.display = "none";
+
+            var status = document.getElementById("copy-status");
+            status.style.display = "inline";
+            
+            setTimeout(function() {
+                status.style.display = "none";
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

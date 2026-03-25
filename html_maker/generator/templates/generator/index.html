@@ -1,0 +1,169 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text to HTML - Magic Box</title>
+    <link rel="stylesheet" href="{% static 'generator/style.css' %}">
+    <style>
+        .quick-hints {
+            margin-top: 15px;
+            margin-bottom: 10px;
+            text-align: left;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 5px; /* Chips ke beech gap */
+        }
+        .chip {
+            display: inline-block;
+            cursor: pointer;
+            background: #f1f1f1;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            border: 1px solid #ddd;
+            transition: 0.3s;
+            white-space: nowrap;
+        }
+        .chip:hover {
+            background: #e2e2e2;
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .clear-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.3s;
+        }
+        .clear-btn:hover {
+            background: #d32f2f;
+        }
+        /* Spinner Animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loader {
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>✨ HTML Magic Box</h2>
+        <p>Apni bhasha chunein aur command likhein:</p>
+
+        <form method="POST" onsubmit="return showLoading()">
+            {% csrf_token %}
+            
+            <div class="input-group">
+                <label for="language_choice">Language Chunein:</label>
+                <select name="language_choice" id="language_choice" class="lang-select">
+                    <option value="mix" selected>Mix (Hinglish) - Default</option>
+                    <option value="en">English Only</option>
+                    <option value="hi">Hindi Only (हिंदी)</option>
+                </select>
+            </div>
+
+            <div class="quick-hints">
+    <span class="chip" onclick="addText('ek chart bana kar do')">📊 Chart</span>
+    <span class="chip" onclick="addText('login form banao')">🔐 Login Form</span>
+    <span class="chip" onclick="addText('ek badi table banao')">📋 Table</span>
+    <span class="chip" onclick="addText('lal button banao')">🔴 Red Button</span>
+    <span class="chip" onclick="addText('ek sundar sa navigation menu')">🍔 Navbar</span>
+
+    <span class="chip" onclick="addText('pricing table banao')">💰 Pricing</span>
+    <span class="chip" onclick="addText('customer review section')">⭐ Reviews</span>
+    <span class="chip" onclick="addText('newsletter subscription form')">📩 Newsletter</span>
+    <span class="chip" onclick="addText('faqs section banao')">❓ FAQ</span>
+    <span class="chip" onclick="addText('hamari team dikhao')">👥 Team</span>
+
+    <span class="chip" onclick="addText('meri gallery dikhao')">🖼️ Gallery</span>
+    <span class="chip" onclick="addText('video player section')">🎥 Video</span>
+    <span class="chip" onclick="addText('wildlife page banao')">🦁 Wildlife</span>
+    <span class="chip" onclick="addText('music player layout')">🎵 Music</span>
+    <span class="chip" onclick="addText('social media profile links')">🔗 Social</span>
+
+    <span class="chip" onclick="addText('contact us page layout')">📞 Contact</span>
+    <span class="chip" onclick="addText('ek sundar sa footer')">🏁 Footer</span>
+    <span class="chip" onclick="addText('education notes section')">📚 Education</span>
+    <span class="chip" onclick="addText('product card dikhao')">🛍️ Product</span>
+    <span class="chip" onclick="addText('blog post preview')">📰 Blog</span>
+
+    <button type="button" onclick="clearText()" class="clear-btn">🗑️ Clear All</button>
+</div>
+
+            <textarea 
+                id="mainInput"
+                name="user_content" 
+                rows="8" 
+                placeholder="Yahan command likhein (e.g., 'pricing table banao')..." 
+                oninput="countChars()"
+                required></textarea>
+            
+            <p style="text-align: right; font-size: 12px; color: #666; margin-top: 5px;">
+                Characters: <span id="charCount">0</span>
+            </p>
+            
+            <br>
+            
+            <button type="submit" class="generate-btn" id="genBtn">
+                <span id="btnText">Generate Website Code</span>
+                <span id="spinner" style="display:none;">
+                    <div class="loader"></div> Generating Magic...
+                </span>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // Chips functionality
+        function addText(val) {
+            var input = document.getElementById("mainInput");
+            input.value = val;
+            countChars(); 
+            input.focus();
+        }
+
+        // Character counter
+        function countChars() {
+            var str = document.getElementById("mainInput").value;
+            document.getElementById("charCount").innerHTML = str.length;
+        }
+
+        // Clear button
+        function clearText() {
+            document.getElementById("mainInput").value = '';
+            document.getElementById("charCount").innerHTML = 0;
+        }
+
+        // Loading spinner logic
+        function showLoading() {
+            var inputVal = document.getElementById("mainInput").value.trim();
+            if(inputVal !== "") {
+                document.getElementById("btnText").style.display = "none";
+                document.getElementById("spinner").style.display = "inline";
+                document.getElementById("genBtn").style.background = "#2ecc71"; // Success color change
+                document.getElementById("genBtn").style.pointerEvents = "none";
+                return true;
+            }
+            return false;
+        }
+    </script>
+</body>
+</html>
